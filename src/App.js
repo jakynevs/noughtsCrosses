@@ -8,19 +8,7 @@ function Square({ value, onSquareClick }) {
   );
 }
 
-export default function Board() {
-  const [squares, setSquares] = useState(Array(9).fill(null));
-  const [count, setCount] = useState(0);
-  const [fill, setFill] = useState("X");
-  const winner = calculateWinner(squares);
-
-  let status;
-  if (winner) {
-    status = winner + " wins!";
-  } else {
-    status = "next turn: " + fill;
-  }
-
+function Board({ squares, onPlay, fill }) {
   function handleClick(i) {
     if (squares[i] || calculateWinner(squares)) {
       return;
@@ -28,10 +16,17 @@ export default function Board() {
 
     const nextSquares = squares.slice();
     nextSquares[i] = fill;
-    setSquares(nextSquares);
-    setCount(count + 1);
-    setFill(count % 2 == 0 ? "O" : "X");
+
+    onPlay(nextSquares);
   }
+  const winner = calculateWinner(squares);
+  let status;
+  if (winner) {
+    status = winner + " wins!";
+  } else {
+    status = "next turn: " + fill;
+  }
+
   return (
     <div>
       <div className="status">{status}</div>
@@ -49,6 +44,49 @@ export default function Board() {
         <Square value={squares[6]} onSquareClick={() => handleClick(6)} />
         <Square value={squares[7]} onSquareClick={() => handleClick(7)} />
         <Square value={squares[8]} onSquareClick={() => handleClick(8)} />
+      </div>
+    </div>
+  );
+}
+
+export default function Game() {
+  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [count, setCount] = useState(0);
+  const fill = count % 2 === 0 ? "O" : "X";
+  const currentSquares = history[count];
+
+  function handlePlay(nextSquares) {
+    const nextHistory = [...history.slice(0, count + 1), nextSquares];
+    setHistory(nextHistory);
+    setCount(nextHistory.length - 1);
+  }
+
+  function jumpTo(nextMove) {
+    setCount(nextMove);
+  }
+
+  const moves = history.map((move) => {
+    let description;
+    move > 0 ? (description = "Go to move " + move) : (description = "");
+    return (
+      <li key={move}>
+        <button onClick={() => jumpTo(move)}>{description}</button>
+      </li>
+    );
+  });
+
+  return (
+    <div className="game">
+      <div className="game-board">
+        <Board
+          fill={fill}
+          count={count}
+          squares={currentSquares}
+          onPlay={handlePlay}
+        />
+      </div>
+      <div className="game-info">
+        <ol>{moves}</ol>
       </div>
     </div>
   );
