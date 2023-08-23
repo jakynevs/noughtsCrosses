@@ -65,9 +65,11 @@ export default function Game() {
     setCount(nextMove);
   }
 
-  const moves = history.map((move) => {
+  const moves = history.map((_squares, move) => {
     let description;
-    move > 0 ? (description = "Go to move " + move) : (description = "");
+    move > 0
+      ? (description = "Go to move " + move)
+      : (description = "Go to start");
     return (
       <li key={move}>
         <button onClick={() => jumpTo(move)}>{description}</button>
