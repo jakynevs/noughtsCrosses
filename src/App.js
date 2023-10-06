@@ -57,9 +57,16 @@ function Board({ squares, onPlay, fill }) {
 export default function Game() {
   const [history, setHistory] = useState([Array(9).fill(null)]);
   const [count, setCount] = useState(0);
+  const [ascending, setAscending] = useState(true)
+  const displayOrder = !ascending ? 'Change order: Ascending' : 'Change order: Descending'
   const fill = count % 2 === 0 ? "O" : "X";
   const currentSquares = history[count];
   let currentMove = count
+
+  function toggleOrder() {
+    setAscending(!ascending)
+  }
+
   function handlePlay(nextSquares) {
     const nextHistory = [...history.slice(0, count + 1), nextSquares];
     setHistory(nextHistory);
@@ -97,7 +104,12 @@ export default function Game() {
         />
       </div>
       <div className="game-info">
-        <ol>{moves}</ol>
+        <div class='center'>
+          <button onClick={toggleOrder}>
+            {displayOrder}
+          </button>
+        </div>
+        <ol>{ascending ? moves : moves.slice().reverse()}</ol>
       </div>
     </div>
   );
