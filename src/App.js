@@ -88,7 +88,7 @@ export default function Game() {
     if (move > 0) {
       const row = Math.floor(turnInfo.index / 3);
       const col = turnInfo.index % 3;
-      const symbol = turnInfo.index % 2 === 0 ? 'X' : 'O';
+      const symbol = move % 2 === 0 ? 'X' : 'O';
       moveDetails = ' - ' + symbol + '(' + row + ', ' + col + ')';
       description = "Go to move " + move + moveDetails
       } else {
