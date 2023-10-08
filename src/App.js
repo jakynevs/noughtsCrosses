@@ -20,7 +20,7 @@ function Board({ squares, onPlay, fill }) {
     const nextSquares = squares.slice();
     nextSquares[i] = fill;
     
-    onPlay(nextSquares);
+    onPlay(nextSquares, i);
   }
   
   const winnerInfo = calculateWinner(squares);
@@ -60,20 +60,20 @@ function Board({ squares, onPlay, fill }) {
 
 
 export default function Game() {
-  const [history, setHistory] = useState([Array(9).fill(null)]);
+  const [history, setHistory] = useState([{squares: Array(9).fill(null), index: -1}]);
   const [count, setCount] = useState(0);
   const [ascending, setAscending] = useState(true)
   const displayOrder = !ascending ? 'Change order: Ascending' : 'Change order: Descending'
   const fill = count % 2 === 0 ? "O" : "X";
-  const currentSquares = history[count];
+  const currentSquares = history[count].squares;
   let currentMove = count
 
   function toggleOrder() {
     setAscending(!ascending)
   }
 
-  function handlePlay(nextSquares) {
-    const nextHistory = [...history.slice(0, count + 1), nextSquares];
+  function handlePlay(nextSquares, i) {
+    const nextHistory = [...history.slice(0, count + 1), {squares: nextSquares, index: i}];
     setHistory(nextHistory);
     setCount(nextHistory.length - 1);
   }
@@ -82,15 +82,22 @@ export default function Game() {
     setCount(nextMove);
   }
 
-  const moves = history.map((_squares, move) => {
+  const moves = history.map((turnInfo, move) => {
     let description;
-    move > 0
-      ? (description = "Go to move " + move)
-      : (description = "Go to start");
+    let moveDetails = ""
+    if (move > 0) {
+      const row = Math.floor(turnInfo.index / 3);
+      const col = turnInfo.index % 3;
+      const symbol = turnInfo.index % 2 === 0 ? 'X' : 'O';
+      moveDetails = ' - ' + symbol + '(' + row + ', ' + col + ')';
+      description = "Go to move " + move + moveDetails
+      } else {
+        description = "Go to start";
+    }
     return (
       <li key={move}>
         {move === currentMove ? (
-          <>You are at move #{move}</>
+          <>You are at move #{move}{moveDetails}</>
         ) : (
           <button onClick={() => jumpTo(move)}>{description}</button>
         )}
